@@ -1,21 +1,25 @@
-import { useState } from "react";
-import { TCard } from "@features/TodoList/model/types";
-import { CheckBox } from "@shared/ui/CheckBox";
-import { Button } from "@shared/ui/Button";
-import { Input } from "@shared/ui/Input/Input";
-import { Title } from "@shared/ui/Title";
+import { memo, useState } from 'react';
+import { TCard } from '@features/TodoList/model/types';
+import { CheckBox } from '@shared/ui/CheckBox';
+import { Button } from '@shared/ui/Button';
+import { Input } from '@shared/ui/Input/Input';
+import { Title } from '@shared/ui/Title';
 import s from './TaskCard.module.scss';
-import { useDispatch } from "react-redux";
-import { toggleTask, removeTask, editTask } from "@features/TodoList/model";
+import { useDispatch } from 'react-redux';
+import { toggleTask, removeTask, editTask } from '@features/TodoList/model';
+import cn from 'classnames';
+import { DragDropHandlers } from '@features/TodoList/model/useDragAndDrop';
 
 type TTaskCardProps = {
   card: TCard;
   index: number;
+  dragDropHandlers?: DragDropHandlers;
 };
 
-export const TaskCard: React.FC<TTaskCardProps> = ({
+export const TaskCardComponent: React.FC<TTaskCardProps> = ({
   card,
   index,
+  dragDropHandlers,
 }) => {
   const dispatch = useDispatch();
   const [isEdit, setIsEdit] = useState(false);
@@ -23,18 +27,36 @@ export const TaskCard: React.FC<TTaskCardProps> = ({
 
   const onToggle = (id: string) => dispatch(toggleTask(id));
   const onDelete = (id: string) => dispatch(removeTask(id));
-  const onEdit = (id: string, title: string) => dispatch(editTask({ id, title }));
+  const onEdit = (id: string, title: string) =>
+    dispatch(editTask({ id, title }));
 
   return (
-    <li className={s.cardList}    >
+    <li
+      className={cn(s.cardList, {
+        [s.dragOver]:
+          dragDropHandlers?.isDragging &&
+          dragDropHandlers.dragOverIndex === index,
+      })}
+      draggable={!isEdit}
+      onDragStart={(e) => dragDropHandlers?.handleDragStart(e, card, index)}
+      onDragOver={dragDropHandlers?.handleDragOver}
+      onDragEnter={(e) => dragDropHandlers?.handleDragEnter(e, index)}
+      onDragLeave={dragDropHandlers?.handleDragLeave}
+      onDrop={(e) => dragDropHandlers?.handleDrop(e, index)}
+      onDragEnd={dragDropHandlers?.handleDragEnd}
+    >
       <div className={s.cardList_left}>
         <CheckBox
           checked={card.checked}
           onChange={() => onToggle(card.id)}
-          label="" />
-        <span>{index + 1}.</span>
+          label=""
+        />
+        <span>{card.number}</span>
         {isEdit ? (
-          <Input value={editValue} onChange={(e) => setEditValue(e.target.value)} />
+          <Input
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+          />
         ) : (
           <Title text={card.title} />
         )}
@@ -61,7 +83,10 @@ export const TaskCard: React.FC<TTaskCardProps> = ({
             >
               Редактировать
             </Button>
-            <Button className={s.cardList_button} onClick={() => onDelete(card.id)}>
+            <Button
+              className={s.cardList_button}
+              onClick={() => onDelete(card.id)}
+            >
               Удалить
             </Button>
           </>
@@ -70,3 +95,5 @@ export const TaskCard: React.FC<TTaskCardProps> = ({
     </li>
   );
 };
+
+export const TaskCard = memo(TaskCardComponent);

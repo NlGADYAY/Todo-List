@@ -5,7 +5,8 @@ export type TCard = {
   title: string;
   checked: boolean;
   create_ad: Date | string;
-  number: number
+  number: number;
+  order?: number;
 };
 
 export type TTasksState = Record<TCardId, TCard>;

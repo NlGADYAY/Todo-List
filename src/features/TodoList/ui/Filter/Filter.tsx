@@ -7,7 +7,6 @@ type FilterProps = {
 }
 
 export const Filter: React.FC<FilterProps> = ({ isFilter, onFilter }) => {
-
   return (
     <div className={s.filter_container}>
       <CheckBox
