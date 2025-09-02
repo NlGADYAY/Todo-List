@@ -1,0 +1,23 @@
+.cardList {
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  margin-bottom: 0.5rem;
+  border: 1px solid gray;
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.cardList_left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cardList_right {
+  display: flex;
+  gap: 0.5rem; 
+}
+
+
+
