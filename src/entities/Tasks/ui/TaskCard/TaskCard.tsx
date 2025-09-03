@@ -51,7 +51,7 @@ export const TaskCardComponent: React.FC<TTaskCardProps> = ({
           onChange={() => onToggle(card.id)}
           label=""
         />
-        <span>{card.number}</span>
+        <span>{card.order}</span>
         {isEdit ? (
           <Input
             value={editValue}

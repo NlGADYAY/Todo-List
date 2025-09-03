@@ -4,10 +4,19 @@ import { loadTasks } from '@shared/constants/localStorage';
 
 type TasksState = {
   tasks: TTasksState;
+  totalTasks: number;
 };
 
+const loadedTasks = loadTasks();
+
+const maxOrder = (Object.values(loadedTasks) as TCard[]).reduce<number>(
+  (max, task) => Math.max(max, task.order ?? 0),
+  0,
+);
+
 const initialState: TasksState = {
-  tasks: loadTasks(),
+  tasks: loadedTasks,
+  totalTasks: maxOrder,
 };
 
 const tasksSlice = createSlice({
@@ -15,22 +24,15 @@ const tasksSlice = createSlice({
   initialState,
   reducers: {
     addTask: (state, action: PayloadAction<TCard>) => {
+      state.totalTasks += 1;
       const newTask = {
         ...action.payload,
-        order: Object.keys(state.tasks).length,
+       order: state.totalTasks,
       };
       state.tasks[action.payload.id] = newTask;
     },
     removeTask: (state, action: PayloadAction<TCardId>) => {
       delete state.tasks[action.payload];
-
-      const remainingTasks = Object.values(state.tasks).sort(
-        (a, b) => (a.order ?? 0) - (b.order ?? 0),
-      );
-
-      remainingTasks.forEach((task, index) => {
-        state.tasks[task.id].order = index;
-      });
     },
     editTask: (
       state,
@@ -51,7 +53,7 @@ const tasksSlice = createSlice({
       action.payload.forEach((task, index) => {
         reorderedTasks[task.id] = {
           ...task,
-          order: index,
+         order: index + 1,
         };
       });
       state.tasks = reorderedTasks;
